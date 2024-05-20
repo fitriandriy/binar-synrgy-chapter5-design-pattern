@@ -1,10 +1,10 @@
-const { UsersModel } = require('../models/user.model')
+const { getUserByEmail, createUserService, updateUserService, deleteUserService } = require('../service/userService')
 
 const login = async (req, res) => {
   const { email, password } = req.body
 
   try {
-    const user = await UsersModel.query().findOne({ email })
+    const user = await getUserByEmail(email)
 
     if (user) {
       if (user.password === password) {
@@ -35,7 +35,7 @@ const register = async (req, res) => {
 
   try {
     if ( email && password ) {
-      await UsersModel.query().insert({ user_type:"common", email, password })
+      await createUserService(email, password)
 
       return res.status(200).json({
         status: true,
@@ -52,7 +52,7 @@ const update = async (req, res) => {
   const { id } = req.params
   const data = req.body
   try {
-    const updated = await UsersModel.query().where({ id }).update(data)
+    const updated = await updateUserService(id, data)
 
     if (updated == 0) {
       return res.status(404).json({
@@ -75,7 +75,7 @@ const update = async (req, res) => {
 const deleteUser = async (req, res) => {
   const { id } = req.params
   try {
-    const result = await UsersModel.query().where({ id }).delete()
+    const result = await deleteUserService(id)
 
     if (result == 0) {
       return res.status(404).json({
